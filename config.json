@@ -1,0 +1,8 @@
+{
+    "hotkeys": [
+        {
+            "key": "ctrl+shift+a",
+            "actions": ["right_click", "up", "up", "enter"]
+        }
+    ]
+} 
