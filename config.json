@@ -1,8 +1,12 @@
 {
     "hotkeys": [
         {
-            "key": "ctrl+shift+a",
+            "key": "f2",
             "actions": ["right_click", "up", "up", "enter"]
+        },
+        {
+            "key": "f3",
+            "actions": ["ctrl+v", "down"]
         }
     ]
 } 

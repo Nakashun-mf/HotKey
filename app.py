@@ -7,6 +7,10 @@ def perform_actions(actions):
     for action in actions:
         if action == "right_click":
             pyautogui.click(button='right')
+        elif "+" in action:
+            # 複合キーの処理（例：ctrl+v）
+            keys = action.split("+")
+            pyautogui.hotkey(*keys)
         else:
             pyautogui.press(action)
 
