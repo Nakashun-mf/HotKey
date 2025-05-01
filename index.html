@@ -1,0 +1,1464 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>キーボードマクロ設定</title>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #2196F3;
+            --success-color: #4CAF50;
+            --danger-color: #f44336;
+            --text-color: #333;
+            --border-color: #ddd;
+            --hover-color: #f5f5f5;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f8f9fa;
+            color: var(--text-color);
+        }
+
+        .container {
+            background-color: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+
+        h1 {
+            color: var(--text-color);
+            margin: 0;
+            font-size: 24px;
+        }
+
+        .hotkey-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .hotkey-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            margin-bottom: 10px;
+            transition: all 0.2s ease;
+        }
+
+        .hotkey-item:hover {
+            background-color: var(--hover-color);
+            transform: translateY(-2px);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+
+        .hotkey-info {
+            flex-grow: 1;
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .hotkey-key {
+            font-weight: bold;
+            color: var(--primary-color);
+            background-color: #e3f2fd;
+            padding: 6px 12px;
+            border-radius: 4px;
+            min-width: 80px;
+            text-align: center;
+        }
+
+        .hotkey-actions {
+            color: var(--text-color);
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .action-tag {
+            background-color: #f5f5f5;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 8px;
+        }
+
+        button {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        button:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .add-button {
+            background-color: var(--success-color);
+            color: white;
+        }
+
+        .edit-button {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 6px;
+            border: none;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.2s;
+        }
+
+        .edit-button:hover {
+            opacity: 0.9;
+            transform: translateY(-1px);
+        }
+
+        .delete-button {
+            background-color: var(--danger-color);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 6px;
+            border: none;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.2s;
+        }
+
+        .delete-button:hover {
+            opacity: 0.9;
+            transform: translateY(-1px);
+        }
+
+        .icon-button {
+            background: none;
+            border: none;
+            padding: 8px;
+            border-radius: 6px;
+            cursor: pointer;
+            color: var(--danger-color);
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .icon-button:hover {
+            background-color: #fee;
+            transform: translateY(-1px);
+        }
+
+        .material-icons {
+            font-size: 20px;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+            z-index: 1000;
+        }
+
+        .modal-content {
+            background-color: white;
+            margin: 5% auto;
+            padding: 30px;
+            border-radius: 12px;
+            width: 90%;
+            max-width: 600px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+            max-height: 90vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .modal-body {
+            flex: 1;
+            overflow-y: auto;
+            padding-right: 10px;
+        }
+
+        .modal-body::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .modal-body::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 4px;
+        }
+
+        .modal-body::-webkit-scrollbar-thumb {
+            background: #ccc;
+            border-radius: 4px;
+        }
+
+        .modal-body::-webkit-scrollbar-thumb:hover {
+            background: #999;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: var(--text-color);
+            font-weight: 500;
+        }
+
+        input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid var(--border-color);
+            border-radius: 6px;
+            box-sizing: border-box;
+            font-size: 16px;
+            transition: border-color 0.2s;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+        }
+
+        .modal-buttons {
+            display: flex;
+            justify-content: flex-end;
+            gap: 12px;
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid #eee;
+        }
+
+        .modal-title {
+            margin: 0 0 20px 0;
+            color: var(--text-color);
+            font-size: 20px;
+        }
+
+        .action-hint {
+            font-size: 14px;
+            color: #666;
+            margin-top: 4px;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px;
+            color: #666;
+        }
+
+        .empty-state p {
+            margin: 10px 0;
+        }
+
+        .action-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-top: 10px;
+            max-height: 300px;
+            overflow-y: auto;
+            padding-right: 10px;
+        }
+
+        .action-list::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .action-list::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 4px;
+        }
+
+        .action-list::-webkit-scrollbar-thumb {
+            background: #ccc;
+            border-radius: 4px;
+        }
+
+        .action-list::-webkit-scrollbar-thumb:hover {
+            background: #999;
+        }
+
+        .action-item {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .action-item input {
+            flex-grow: 1;
+        }
+
+        .action-item button {
+            padding: 8px;
+            min-width: 40px;
+            height: 40px;
+        }
+
+        .action-item .drag-handle {
+            cursor: move;
+            color: #999;
+            padding: 8px;
+            user-select: none;
+        }
+
+        .action-item .drag-handle:hover {
+            color: var(--primary-color);
+        }
+
+        .add-action-button {
+            background-color: #e3f2fd;
+            color: var(--primary-color);
+            border: 1px dashed var(--primary-color);
+            width: 100%;
+            margin-top: 10px;
+        }
+
+        .add-action-button:hover {
+            background-color: #bbdefb;
+        }
+
+        .action-item.dragging {
+            opacity: 0.5;
+            background-color: #f5f5f5;
+        }
+
+        .key-input, .action-input-container {
+            position: relative;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .input-group {
+            position: relative;
+            flex: 1;
+        }
+
+        .input-buttons {
+            display: flex;
+            gap: 4px;
+        }
+
+        .mode-button {
+            background: none;
+            border: 1px solid #ddd;
+            padding: 8px;
+            border-radius: 6px;
+            cursor: pointer;
+            color: #666;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 40px;
+        }
+
+        .mode-button:hover {
+            background-color: #f5f5f5;
+            border-color: var(--primary-color);
+            color: var(--primary-color);
+        }
+
+        .mode-button.active {
+            background-color: var(--primary-color);
+            border-color: var(--primary-color);
+            color: white;
+        }
+
+        .clear-button {
+            background: none;
+            border: none;
+            color: #999;
+            cursor: pointer;
+            padding: 4px;
+            position: absolute;
+            right: 8px;
+            top: 50%;
+            transform: translateY(-50%);
+            display: none;
+        }
+
+        input:focus + .clear-button {
+            display: block;
+        }
+
+        .key-combo {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            background-color: #e3f2fd;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+
+        .key-combo .key {
+            background-color: white;
+            padding: 2px 6px;
+            border-radius: 3px;
+            border: 1px solid #ddd;
+        }
+
+        .key-combo .plus {
+            color: #666;
+        }
+
+        .recording {
+            animation: pulse 1s infinite;
+        }
+
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(33, 150, 243, 0.4); }
+            70% { box-shadow: 0 0 0 10px rgba(33, 150, 243, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(33, 150, 243, 0); }
+        }
+
+        .key-preview {
+            margin-top: 10px;
+            padding: 10px;
+            background-color: #f8f9fa;
+            border-radius: 6px;
+            display: none;
+        }
+
+        .key-preview.visible {
+            display: block;
+        }
+
+        .key-preview .key {
+            display: inline-flex;
+            align-items: center;
+            background-color: white;
+            padding: 4px 8px;
+            border-radius: 4px;
+            border: 1px solid #ddd;
+            margin: 2px;
+            font-size: 14px;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+        }
+
+        .key-preview .key.held {
+            background-color: #e3f2fd;
+            border-color: var(--primary-color);
+        }
+
+        .templates {
+            margin-top: 10px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            background: #f8f9fa;
+            padding: 12px;
+            border-radius: 8px;
+        }
+
+        .templates-label {
+            width: 100%;
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 4px;
+        }
+
+        .template-button {
+            background-color: white;
+            border: 1px solid #ddd;
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        .template-button:hover {
+            background-color: #e3f2fd;
+            border-color: var(--primary-color);
+            transform: translateY(-1px);
+            box-shadow: 0 2px 5px rgba(0,0,0,0.15);
+        }
+
+        .template-button .key {
+            background-color: #f8f9fa;
+            padding: 4px 8px;
+            border-radius: 4px;
+            border: 1px solid #ddd;
+            font-size: 13px;
+            font-weight: 500;
+        }
+
+        .template-button .plus {
+            color: #666;
+            font-size: 13px;
+            font-weight: 500;
+        }
+
+        .error-message {
+            color: var(--danger-color);
+            font-size: 14px;
+            margin-top: 4px;
+            display: none;
+        }
+
+        .error-message.visible {
+            display: block;
+        }
+
+        .help-button {
+            background: none;
+            border: none;
+            color: #666;
+            cursor: pointer;
+            padding: 4px;
+            margin-left: 8px;
+        }
+
+        .help-button:hover {
+            color: var(--primary-color);
+        }
+
+        .help-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+            z-index: 1001;
+        }
+
+        .help-modal-content {
+            background-color: white;
+            margin: 10% auto;
+            padding: 30px;
+            border-radius: 12px;
+            width: 90%;
+            max-width: 600px;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        .help-section {
+            margin-bottom: 20px;
+        }
+
+        .help-section h3 {
+            color: var(--primary-color);
+            margin-bottom: 10px;
+        }
+
+        .help-section ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .help-section li {
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .help-section .key {
+            background-color: #f5f5f5;
+            padding: 2px 6px;
+            border-radius: 3px;
+            border: 1px solid #ddd;
+            font-size: 14px;
+        }
+
+        .help-icon {
+            color: #666;
+            cursor: pointer;
+            margin-left: 8px;
+            font-size: 18px;
+            transition: color 0.2s;
+        }
+
+        .help-icon:hover {
+            color: var(--primary-color);
+        }
+
+        .tooltip {
+            position: relative;
+            display: inline-flex;
+            align-items: center;
+        }
+
+        .tooltip .tooltip-text {
+            visibility: hidden;
+            background-color: #333;
+            color: white;
+            text-align: left;
+            padding: 12px;
+            border-radius: 8px;
+            font-size: 14px;
+            line-height: 1.5;
+            position: absolute;
+            z-index: 1;
+            width: 320px;
+            top: -12px;
+            left: 30px;
+            opacity: 0;
+            transition: opacity 0.2s;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+        }
+
+        .tooltip .tooltip-text::after {
+            content: "";
+            position: absolute;
+            top: 16px;
+            right: 100%;
+            margin-top: -5px;
+            border-width: 5px;
+            border-style: solid;
+            border-color: transparent #333 transparent transparent;
+        }
+
+        .tooltip:hover .tooltip-text {
+            visibility: visible;
+            opacity: 1;
+        }
+
+        @media (max-width: 768px) {
+            .tooltip .tooltip-text {
+                width: 260px;
+                left: auto;
+                right: 30px;
+            }
+
+            .tooltip .tooltip-text::after {
+                left: 100%;
+                right: auto;
+                border-color: transparent transparent transparent #333;
+            }
+        }
+
+        .tooltip-list {
+            margin: 0;
+            padding: 0 0 0 20px;
+        }
+
+        .tooltip-list li {
+            margin-bottom: 4px;
+            white-space: normal;
+        }
+
+        .tooltip-section {
+            margin-bottom: 12px;
+        }
+
+        .tooltip-section:last-child {
+            margin-bottom: 0;
+        }
+
+        .tooltip-title {
+            font-weight: bold;
+            margin-bottom: 6px;
+            color: #fff;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>キーボードマクロ設定</h1>
+            <div class="button-group">
+                <button class="add-button" onclick="openModal()">
+                    <span>新しいホットキーを追加</span>
+                </button>
+                <button class="close-button" onclick="closeApplication()" style="background-color: var(--danger-color); margin-left: 10px;">
+                    <span class="material-icons">close</span>
+                    <span>閉じる</span>
+                </button>
+            </div>
+        </div>
+        <ul class="hotkey-list" id="hotkeyList"></ul>
+    </div>
+
+    <div id="hotkeyModal" class="modal">
+        <div class="modal-content">
+            <h2 id="modalTitle" class="modal-title">新しいホットキーを追加</h2>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label for="hotkeyKey">
+                        キー
+                        <span class="tooltip">
+                            <span class="material-icons help-icon">help_outline</span>
+                            <span class="tooltip-text">
+                                <div class="tooltip-section">
+                                    <div class="tooltip-title">使用可能なキー</div>
+                                    <ul class="tooltip-list">
+                                        <li>F1-F12キー</li>
+                                        <li>数字キー（0-9）</li>
+                                        <li>アルファベットキー（A-Z）</li>
+                                        <li>修飾キー（Ctrl, Alt, Shift）との組み合わせ</li>
+                                    </ul>
+                                </div>
+                            </span>
+                        </span>
+                    </label>
+                    <div class="key-input">
+                        <div class="input-group">
+                            <input type="text" id="hotkeyKey" placeholder="キーを押してください" readonly>
+                            <button class="clear-button" onclick="clearKeyInput()">×</button>
+                        </div>
+                        <div class="input-buttons">
+                            <button class="mode-button active" onclick="toggleKeyInputMode(this, true)" title="キー入力モード">
+                                <span class="material-icons">keyboard</span>
+                            </button>
+                            <button class="mode-button" onclick="toggleKeyInputMode(this, false)" title="文字入力モード">
+                                <span class="material-icons">edit</span>
+                            </button>
+                        </div>
+                    </div>
+                    <div id="keyPreview" class="key-preview"></div>
+                    <div class="templates">
+                        <div class="templates-label">よく使うキー:</div>
+                        <button class="template-button" onclick="applyTemplate('copy')">
+                            <span class="key">Ctrl</span>
+                            <span class="plus">+</span>
+                            <span class="key">C</span>
+                        </button>
+                        <button class="template-button" onclick="applyTemplate('paste')">
+                            <span class="key">Ctrl</span>
+                            <span class="plus">+</span>
+                            <span class="key">V</span>
+                        </button>
+                        <button class="template-button" onclick="applyTemplate('cut')">
+                            <span class="key">Ctrl</span>
+                            <span class="plus">+</span>
+                            <span class="key">X</span>
+                        </button>
+                        <button class="template-button" onclick="applyTemplate('selectAll')">
+                            <span class="key">Ctrl</span>
+                            <span class="plus">+</span>
+                            <span class="key">A</span>
+                        </button>
+                        <button class="template-button" onclick="applyTemplate('rightClick')">
+                            <span class="key">right_click</span>
+                        </button>
+                        <button class="template-button" onclick="applyTemplate('leftClick')">
+                            <span class="key">left_click</span>
+                        </button>
+                        <button class="template-button" onclick="applyTemplate('middleClick')">
+                            <span class="key">middle_click</span>
+                        </button>
+                    </div>
+                    <div id="keyError" class="error-message"></div>
+                </div>
+                <div class="form-group">
+                    <label>
+                        アクション
+                        <span class="tooltip">
+                            <span class="material-icons help-icon">help_outline</span>
+                            <span class="tooltip-text">
+                                <div class="tooltip-section">
+                                    <div class="tooltip-title">使用可能なアクション</div>
+                                    <ul class="tooltip-list">
+                                        <li>マウス操作：right_click, left_click</li>
+                                        <li>カーソル移動：up, down, left, right</li>
+                                        <li>キー操作：enter</li>
+                                        <li>クリップボード：ctrl+c, ctrl+v, ctrl+x</li>
+                                        <li>その他：ctrl+a（全選択）</li>
+                                    </ul>
+                                </div>
+                                <div class="tooltip-section">
+                                    <div class="tooltip-title">ヒント</div>
+                                    <ul class="tooltip-list">
+                                        <li>複数のアクションを順番に実行できます</li>
+                                        <li>ドラッグ＆ドロップでアクションの順序を変更できます</li>
+                                    </ul>
+                                </div>
+                            </span>
+                        </span>
+                    </label>
+                    <div id="actionList" class="action-list"></div>
+                    <button class="add-action-button" onclick="addActionInput()">
+                        <span>アクションを追加</span>
+                    </button>
+                </div>
+            </div>
+            <div class="modal-buttons">
+                <button onclick="closeModal()">キャンセル</button>
+                <button class="add-button" onclick="saveHotkey()">保存</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="helpModal" class="help-modal">
+        <div class="help-modal-content">
+            <h2>キーボードショートカットヘルプ</h2>
+            <div class="help-section">
+                <h3>修飾キー</h3>
+                <ul>
+                    <li><span class="key">Ctrl</span> - コントロールキー</li>
+                    <li><span class="key">Alt</span> - オルトキー</li>
+                    <li><span class="key">Shift</span> - シフトキー</li>
+                </ul>
+            </div>
+            <div class="help-section">
+                <h3>特殊キー</h3>
+                <ul>
+                    <li><span class="key">F1</span> - <span class="key">F12</span> - ファンクションキー</li>
+                    <li><span class="key">↑</span> - 上矢印キー</li>
+                    <li><span class="key">↓</span> - 下矢印キー</li>
+                    <li><span class="key">←</span> - 左矢印キー</li>
+                    <li><span class="key">→</span> - 右矢印キー</li>
+                    <li><span class="key">Enter</span> - エンターキー</li>
+                </ul>
+            </div>
+            <div class="help-section">
+                <h3>よく使う組み合わせ</h3>
+                <ul>
+                    <li><span class="key">Ctrl</span> + <span class="key">C</span> - コピー</li>
+                    <li><span class="key">Ctrl</span> + <span class="key">V</span> - 貼り付け</li>
+                    <li><span class="key">Ctrl</span> + <span class="key">X</span> - 切り取り</li>
+                    <li><span class="key">Ctrl</span> + <span class="key">A</span> - すべて選択</li>
+                </ul>
+            </div>
+            <div class="help-section">
+                <h3>操作方法</h3>
+                <ul>
+                    <li>キー入力フィールドをクリックして、実際のキーを押してください</li>
+                    <li>修飾キー（Ctrl、Alt、Shift）は他のキーと組み合わせて使用できます</li>
+                    <li>テンプレートボタンをクリックして、よく使う組み合わせを素早く入力できます</li>
+                </ul>
+            </div>
+            <div class="modal-buttons">
+                <button onclick="closeHelpModal()">閉じる</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let config = { hotkeys: [] };
+        let editingIndex = -1;
+        let draggedItem = null;
+        let isRecordingKey = false;
+        let currentModifiers = new Set();
+        let lastFocusedInput = null;
+
+        // 設定の読み込み
+        async function loadConfig() {
+            try {
+                const response = await fetch('/config.json');
+                config = await response.json();
+                renderHotkeys();
+            } catch (error) {
+                console.error('設定の読み込みに失敗しました:', error);
+            }
+        }
+
+        // 設定の保存
+        async function saveConfig() {
+            try {
+                const response = await fetch('/save_config', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(config),
+                });
+                if (!response.ok) {
+                    throw new Error('設定の保存に失敗しました');
+                }
+            } catch (error) {
+                console.error('設定の保存に失敗しました:', error);
+                alert('設定の保存に失敗しました。');
+            }
+        }
+
+        // キー入力のクリア
+        function clearKeyInput() {
+            document.getElementById('hotkeyKey').value = '';
+            currentModifiers.clear();
+            document.getElementById('keyError').classList.remove('visible');
+        }
+
+        // キー入力モードの切り替え
+        function toggleKeyInputMode(button, isKeyMode) {
+            const keyInput = document.getElementById('hotkeyKey');
+            const buttons = button.parentElement.querySelectorAll('.mode-button');
+            
+            buttons.forEach(btn => btn.classList.remove('active'));
+            button.classList.add('active');
+
+            keyInput.readOnly = isKeyMode;
+            currentModifiers.clear();
+            updateKeyPreview();
+            
+            if (isKeyMode) {
+                keyInput.value = '';
+                keyInput.placeholder = 'キーを押してください';
+                isRecordingKey = true;
+            } else {
+                keyInput.placeholder = '文字を入力してください';
+                isRecordingKey = false;
+            }
+        }
+
+        // アクション入力モードの切り替え
+        function toggleActionInputMode(button, isKeyMode) {
+            const actionInput = button.closest('.action-input-container').querySelector('.action-input');
+            const buttons = button.parentElement.querySelectorAll('.mode-button');
+            
+            buttons.forEach(btn => btn.classList.remove('active'));
+            button.classList.add('active');
+
+            if (isKeyMode) {
+                actionInput.value = '';
+                actionInput.readOnly = true;
+                actionInput.placeholder = 'キーを押してください';
+                startActionRecording(actionInput);
+            } else {
+                finishActionRecording(actionInput);
+                actionInput.readOnly = false;
+                actionInput.placeholder = '文字を入力してください';
+                actionInput.focus();
+            }
+        }
+
+        // アクションの記録開始
+        function startActionRecording(input) {
+            const allInputs = document.querySelectorAll('.action-input');
+            allInputs.forEach(i => {
+                i.classList.remove('recording');
+                if (i.cleanup) {
+                    i.cleanup();
+                    i.cleanup = null;
+                }
+            });
+
+            input.classList.add('recording');
+            isRecordingKey = true;
+            currentModifiers.clear();
+
+            // 一時的なイベントリスナーを設定
+            const keyHandler = function(e) {
+                if (!input.classList.contains('recording')) return;
+
+                if (e.type === 'keydown') {
+                    // Enterキーで入力確定
+                    if (e.key === 'Enter') {
+                        finishActionRecording(input);
+                        return;
+                    }
+
+                    // Escapeキーで入力キャンセル
+                    if (e.key === 'Escape') {
+                        input.value = input.defaultValue;
+                        finishActionRecording(input);
+                        return;
+                    }
+
+                    if (!input.readOnly) return;
+
+                    e.preventDefault();
+                    let key = e.key.toLowerCase();
+                    
+                    // 修飾キーの処理
+                    if (key === 'control' || key === 'alt' || key === 'shift') {
+                        currentModifiers.add(key);
+                        return;
+                    }
+
+                    // 特殊キーの処理
+                    if (key.startsWith('f') && /^f[1-9]|f1[0-2]$/.test(key)) {
+                        key = key.toUpperCase();
+                    }
+
+                    // アクションの種類に応じて処理
+                    let action = '';
+                    if (currentModifiers.size > 0) {
+                        action = Array.from(currentModifiers).join('+') + '+' + key;
+                    } else {
+                        switch(key) {
+                            case 'arrowup': action = 'up'; break;
+                            case 'arrowdown': action = 'down'; break;
+                            case 'arrowleft': action = 'left'; break;
+                            case 'arrowright': action = 'right'; break;
+                            case 'enter': action = 'enter'; break;
+                            default: action = key;
+                        }
+                    }
+
+                    input.value = action;
+                } else if (e.type === 'keyup') {
+                    const key = e.key.toLowerCase();
+                    if (key === 'control' || key === 'alt' || key === 'shift') {
+                        currentModifiers.delete(key);
+                    }
+                }
+            };
+
+            const blurHandler = function() {
+                if (input.classList.contains('recording')) {
+                    finishActionRecording(input);
+                }
+            };
+
+            input.addEventListener('keydown', keyHandler);
+            input.addEventListener('keyup', keyHandler);
+            input.addEventListener('blur', blurHandler);
+
+            // クリーンアップ用の関数を定義
+            input.cleanup = function() {
+                input.removeEventListener('keydown', keyHandler);
+                input.removeEventListener('keyup', keyHandler);
+                input.removeEventListener('blur', blurHandler);
+            };
+
+            input.focus();
+        }
+
+        // アクション記録の終了
+        function finishActionRecording(input) {
+            if (!input) return;
+            
+            input.classList.remove('recording');
+            isRecordingKey = false;
+            currentModifiers.clear();
+            
+            // イベントリスナーのクリーンアップ
+            if (input.cleanup) {
+                input.cleanup();
+                input.cleanup = null;
+            }
+        }
+
+        // キー入力の処理
+        function handleKeyInput(e) {
+            const keyInput = document.getElementById('hotkeyKey');
+            if (!keyInput || !isRecordingKey || !keyInput.readOnly) return;
+
+            const recordingAction = document.querySelector('.action-input.recording');
+            if (recordingAction) return;
+
+            e.preventDefault();
+            
+            if (e.type === 'keydown') {
+                let key = e.key.toLowerCase();
+                
+                // 修飾キーの処理
+                if (key === 'control' || key === 'alt' || key === 'shift') {
+                    currentModifiers.add(key);
+                    updateKeyPreview();
+                    return;
+                }
+
+                // 特殊キーの処理
+                if (key.startsWith('f') && /^f[1-9]|f1[0-2]$/.test(key)) {
+                    key = key.toUpperCase();
+                }
+
+                // 修飾キーと組み合わせて表示
+                const modifiers = Array.from(currentModifiers);
+                const keyCombo = [...modifiers, key].join('+');
+                keyInput.value = keyCombo;
+                checkKeyDuplicate();
+            } else if (e.type === 'keyup') {
+                const key = e.key.toLowerCase();
+                if (key === 'control' || key === 'alt' || key === 'shift') {
+                    currentModifiers.delete(key);
+                    updateKeyPreview();
+                }
+            }
+        }
+
+        // 入力フィールドのフォーカスを記録
+        function handleInputFocus(event) {
+            if (event.target.classList.contains('action-input') || event.target.id === 'hotkeyKey') {
+                lastFocusedInput = event.target;
+            }
+        }
+
+        // アクション入力ボックスの追加
+        function addActionInput(value = '') {
+            const actionList = document.getElementById('actionList');
+            const actionItem = document.createElement('div');
+            actionItem.className = 'action-item';
+            actionItem.draggable = true;
+            
+            actionItem.innerHTML = `
+                <span class="drag-handle">⋮⋮</span>
+                <div class="action-input-container">
+                    <div class="input-group">
+                        <input type="text" class="action-input" placeholder="アクションを入力" value="${value}" readonly>
+                    </div>
+                    <div class="input-buttons">
+                        <button class="mode-button active" onclick="toggleActionInputMode(this, true)" title="キー入力モード">
+                            <span class="material-icons">keyboard</span>
+                        </button>
+                        <button class="mode-button" onclick="toggleActionInputMode(this, false)" title="文字入力モード">
+                            <span class="material-icons">edit</span>
+                        </button>
+                    </div>
+                </div>
+                <button class="icon-button" onclick="removeActionInput(this)" title="削除">
+                    <span class="material-icons">delete</span>
+                </button>
+            `;
+
+            const input = actionItem.querySelector('.action-input');
+            input.addEventListener('click', function() {
+                if (this.readOnly) {
+                    startActionRecording(this);
+                }
+            });
+            input.addEventListener('focus', handleInputFocus);
+
+            // ドラッグ&ドロップのイベントリスナーを設定
+            actionItem.addEventListener('dragstart', handleDragStart);
+            actionItem.addEventListener('dragend', handleDragEnd);
+            actionItem.addEventListener('dragover', handleDragOver);
+            actionItem.addEventListener('drop', handleDrop);
+
+            actionList.appendChild(actionItem);
+            return actionItem;
+        }
+
+        // ホットキーの表示
+        function renderHotkeys() {
+            const list = document.getElementById('hotkeyList');
+            list.innerHTML = '';
+            
+            if (config.hotkeys.length === 0) {
+                list.innerHTML = `
+                    <div class="empty-state">
+                        <p>ホットキーが設定されていません</p>
+                        <p>「新しいホットキーを追加」ボタンをクリックして設定を追加してください</p>
+                    </div>
+                `;
+                return;
+            }
+
+            config.hotkeys.forEach((hotkey, index) => {
+                const li = document.createElement('li');
+                li.className = 'hotkey-item';
+                li.innerHTML = `
+                    <div class="hotkey-info">
+                        <span class="hotkey-key">${hotkey.key}</span>
+                        <div class="hotkey-actions">
+                            ${hotkey.actions.map(action => `
+                                <span class="action-tag">${action}</span>
+                            `).join('')}
+                        </div>
+                    </div>
+                    <div class="button-group">
+                        <button class="edit-button" onclick="editHotkey(${index})">編集</button>
+                        <button class="delete-button" onclick="deleteHotkey(${index})">削除</button>
+                    </div>
+                `;
+                list.appendChild(li);
+            });
+        }
+
+        // モーダルの表示
+        function openModal(index = -1) {
+            editingIndex = index;
+            const modal = document.getElementById('hotkeyModal');
+            const title = document.getElementById('modalTitle');
+            const keyInput = document.getElementById('hotkeyKey');
+            const actionList = document.getElementById('actionList');
+
+            title.textContent = index === -1 ? '新しいホットキーを追加' : 'ホットキーを編集';
+            
+            if (index !== -1) {
+                const hotkey = config.hotkeys[index];
+                keyInput.value = hotkey.key;
+                actionList.innerHTML = '';
+                hotkey.actions.forEach(action => addActionInput(action));
+            } else {
+                keyInput.value = '';
+                actionList.innerHTML = '';
+                addActionInput();
+            }
+
+            modal.style.display = 'block';
+            keyInput.focus();
+        }
+
+        // モーダルの非表示
+        function closeModal() {
+            const modal = document.getElementById('hotkeyModal');
+            const keyInput = document.getElementById('hotkeyKey');
+            keyInput.classList.remove('recording');
+            isRecordingKey = false;
+            currentModifiers.clear();
+            document.getElementById('keyPreview').classList.remove('visible');
+            modal.style.display = 'none';
+        }
+
+        // ホットキーの保存
+        function saveHotkey() {
+            const key = document.getElementById('hotkeyKey').value.toLowerCase();
+            const actionInputs = document.querySelectorAll('.action-input');
+            const actions = Array.from(actionInputs)
+                .map(input => input.value.trim())
+                .filter(action => action);
+
+            if (!key || actions.length === 0) {
+                alert('キーとアクションを入力してください。');
+                return;
+            }
+
+            if (editingIndex === -1) {
+                config.hotkeys.push({ key, actions });
+            } else {
+                config.hotkeys[editingIndex] = { key, actions };
+            }
+
+            saveConfig();
+            closeModal();
+            renderHotkeys();
+        }
+
+        // ホットキーの編集
+        function editHotkey(index) {
+            openModal(index);
+        }
+
+        // ホットキーの削除
+        function deleteHotkey(index) {
+            if (confirm('このホットキーを削除してもよろしいですか？')) {
+                config.hotkeys.splice(index, 1);
+                saveConfig();
+                renderHotkeys();
+            }
+        }
+
+        // ドラッグ開始時の処理
+        function handleDragStart(e) {
+            draggedItem = this;
+            this.classList.add('dragging');
+        }
+
+        // ドラッグ終了時の処理
+        function handleDragEnd(e) {
+            draggedItem = null;
+            this.classList.remove('dragging');
+        }
+
+        // ドラッグオーバー時の処理
+        function handleDragOver(e) {
+            e.preventDefault();
+            const actionList = document.getElementById('actionList');
+            const afterElement = getDragAfterElement(actionList, e.clientY);
+            const currentElement = draggedItem;
+            if (afterElement == null) {
+                actionList.appendChild(draggedItem);
+            } else {
+                actionList.insertBefore(draggedItem, afterElement);
+            }
+        }
+
+        // ドロップ時の処理
+        function handleDrop(e) {
+            e.preventDefault();
+        }
+
+        // ドラッグ後の位置を計算
+        function getDragAfterElement(container, y) {
+            const draggableElements = [...container.querySelectorAll('.action-item:not(.dragging)')];
+
+            return draggableElements.reduce((closest, child) => {
+                const box = child.getBoundingClientRect();
+                const offset = y - box.top - box.height / 2;
+
+                if (offset < 0 && offset > closest.offset) {
+                    return { offset: offset, element: child };
+                } else {
+                    return closest;
+                }
+            }, { offset: Number.NEGATIVE_INFINITY }).element;
+        }
+
+        // アクション入力ボックスの削除
+        function removeActionInput(button) {
+            button.parentElement.remove();
+        }
+
+        // ヘルプモーダルの表示
+        function showHelpModal() {
+            document.getElementById('helpModal').style.display = 'block';
+        }
+
+        // ヘルプモーダルの非表示
+        function closeHelpModal() {
+            document.getElementById('helpModal').style.display = 'none';
+        }
+
+        // テンプレートの適用
+        function applyTemplate(type) {
+            const keyInput = document.getElementById('hotkeyKey');
+            const recordingAction = document.querySelector('.action-input.recording');
+            let targetInput;
+            let value;
+
+            // テンプレートの値を設定
+            switch(type) {
+                case 'copy':
+                    value = 'ctrl+c';
+                    break;
+                case 'paste':
+                    value = 'ctrl+v';
+                    break;
+                case 'cut':
+                    value = 'ctrl+x';
+                    break;
+                case 'selectAll':
+                    value = 'ctrl+a';
+                    break;
+                case 'rightClick':
+                    value = 'right_click';
+                    break;
+                case 'leftClick':
+                    value = 'left_click';
+                    break;
+                case 'middleClick':
+                    value = 'middle_click';
+                    break;
+            }
+
+            // アクション入力中かキー入力中かを判定
+            if (recordingAction) {
+                targetInput = recordingAction;
+                finishActionRecording(recordingAction);
+            } else if (keyInput.classList.contains('recording')) {
+                targetInput = keyInput;
+                keyInput.classList.remove('recording');
+            } else if (lastFocusedInput) {
+                // 最後にフォーカスされていた入力フィールドを使用
+                targetInput = lastFocusedInput;
+            } else {
+                // フォーカスされている要素がない場合は、最後のアクション入力フィールドを使用
+                const actionInputs = document.querySelectorAll('.action-input');
+                if (actionInputs.length > 0) {
+                    targetInput = actionInputs[actionInputs.length - 1];
+                } else {
+                    // アクション入力フィールドがない場合は新しく作成
+                    const newActionItem = addActionInput();
+                    targetInput = newActionItem.querySelector('.action-input');
+                }
+            }
+
+            // 値を設定
+            targetInput.value = value;
+
+            // キー入力フィールドの場合は重複チェック
+            if (targetInput === keyInput) {
+                checkKeyDuplicate();
+            }
+
+            // 入力状態をリセット
+            isRecordingKey = false;
+            currentModifiers.clear();
+            updateKeyPreview();
+
+            // フォーカスを維持
+            targetInput.focus();
+        }
+
+        // キーの重複チェック
+        function checkKeyDuplicate() {
+            const keyInput = document.getElementById('hotkeyKey');
+            const errorMessage = document.getElementById('keyError');
+            const key = keyInput.value.toLowerCase();
+
+            if (!key) {
+                errorMessage.classList.remove('visible');
+                return;
+            }
+
+            const isDuplicate = config.hotkeys.some((hotkey, index) => 
+                index !== editingIndex && hotkey.key.toLowerCase() === key
+            );
+
+            if (isDuplicate) {
+                errorMessage.textContent = 'このキーは既に使用されています';
+                errorMessage.classList.add('visible');
+            } else {
+                errorMessage.classList.remove('visible');
+            }
+        }
+
+        // キープレビューの更新
+        function updateKeyPreview() {
+            const preview = document.getElementById('keyPreview');
+            const keys = Array.from(currentModifiers);
+            
+            if (keys.length > 0) {
+                preview.innerHTML = keys.map(key => 
+                    `<span class="key held">${key}</span>`
+                ).join(' + ');
+                preview.classList.add('visible');
+            } else {
+                preview.classList.remove('visible');
+            }
+        }
+
+        // アプリケーションを閉じる
+        async function closeApplication() {
+            if (confirm('設定アプリを終了してもよろしいですか？')) {
+                try {
+                    // サーバーを終了
+                    await fetch('/shutdown', { method: 'POST' });
+                    // ブラウザのタブを閉じる
+                    window.close();
+                } catch (error) {
+                    console.error('アプリケーションの終了に失敗しました:', error);
+                    alert('アプリケーションの終了に失敗しました。');
+                }
+            }
+        }
+
+        // グローバルなキーイベントリスナー
+        document.addEventListener('keydown', handleKeyInput);
+        document.addEventListener('keyup', handleKeyInput);
+
+        // イベントリスナーの追加（初期化時に実行）
+        document.addEventListener('focusin', handleInputFocus);
+
+        // 初期読み込み
+        loadConfig();
+    </script>
+</body>
+</html> 
