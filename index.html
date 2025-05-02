@@ -484,6 +484,8 @@
             background: #f8f9fa;
             padding: 12px;
             border-radius: 8px;
+            flex-direction: row;
+            align-items: flex-start;
         }
 
         .templates-label {
@@ -694,6 +696,16 @@
             margin-bottom: 6px;
             color: #fff;
         }
+
+        .action-input {
+            width: 350px;
+        }
+
+        #templateButtons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
     </style>
 </head>
 <body>
@@ -704,9 +716,9 @@
                 <button class="add-button" onclick="openModal()">
                     <span>新しいホットキーを追加</span>
                 </button>
-                <button class="close-button" onclick="closeApplication()" style="background-color: var(--danger-color); margin-left: 10px;">
-                    <span class="material-icons">close</span>
-                    <span>閉じる</span>
+                <button class="close-button" onclick="closeApplication()" style="background-color: var(--danger-color); margin-left: 10px; color: #fff;">
+                    <span class="material-icons" style="color: #fff;">close</span>
+                    <span style="color: #fff;">閉じる</span>
                 </button>
             </div>
         </div>
@@ -752,35 +764,7 @@
                     <div id="keyPreview" class="key-preview"></div>
                     <div class="templates">
                         <div class="templates-label">よく使うキー:</div>
-                        <button class="template-button" onclick="applyTemplate('copy')">
-                            <span class="key">Ctrl</span>
-                            <span class="plus">+</span>
-                            <span class="key">C</span>
-                        </button>
-                        <button class="template-button" onclick="applyTemplate('paste')">
-                            <span class="key">Ctrl</span>
-                            <span class="plus">+</span>
-                            <span class="key">V</span>
-                        </button>
-                        <button class="template-button" onclick="applyTemplate('cut')">
-                            <span class="key">Ctrl</span>
-                            <span class="plus">+</span>
-                            <span class="key">X</span>
-                        </button>
-                        <button class="template-button" onclick="applyTemplate('selectAll')">
-                            <span class="key">Ctrl</span>
-                            <span class="plus">+</span>
-                            <span class="key">A</span>
-                        </button>
-                        <button class="template-button" onclick="applyTemplate('rightClick')">
-                            <span class="key">right_click</span>
-                        </button>
-                        <button class="template-button" onclick="applyTemplate('leftClick')">
-                            <span class="key">left_click</span>
-                        </button>
-                        <button class="template-button" onclick="applyTemplate('middleClick')">
-                            <span class="key">middle_click</span>
-                        </button>
+                        <div id="templateButtons"></div>
                     </div>
                     <div id="keyError" class="error-message"></div>
                 </div>
@@ -875,6 +859,7 @@
         let isRecordingKey = false;
         let currentModifiers = new Set();
         let lastFocusedInput = null;
+        let templates = [];
 
         // 設定の読み込み
         async function loadConfig() {
@@ -904,6 +889,36 @@
                 console.error('設定の保存に失敗しました:', error);
                 alert('設定の保存に失敗しました。');
             }
+        }
+
+        // テンプレートの読み込み
+        async function loadTemplates() {
+            try {
+                const response = await fetch('templates.json');
+                const data = await response.json();
+                templates = data.templates || [];
+                renderTemplateButtons();
+            } catch (error) {
+                console.error('テンプレートの読み込みに失敗しました:', error);
+            }
+        }
+
+        function renderTemplateButtons() {
+            const container = document.getElementById('templateButtons');
+            container.innerHTML = '';
+            templates.forEach(tpl => {
+                const btn = document.createElement('button');
+                btn.className = 'template-button';
+                btn.onclick = () => applyTemplate(tpl.value);
+                if (tpl.display) {
+                    btn.innerHTML = tpl.display.map(part =>
+                        part === '+' ? '<span class="plus">+</span>' : `<span class="key">${part}</span>`
+                    ).join(' ');
+                } else {
+                    btn.innerHTML = `<span class="key">${tpl.label || tpl.value}</span>`;
+                }
+                container.appendChild(btn);
+            });
         }
 
         // キー入力のクリア
@@ -1327,36 +1342,10 @@
         }
 
         // テンプレートの適用
-        function applyTemplate(type) {
+        function applyTemplate(value) {
             const keyInput = document.getElementById('hotkeyKey');
             const recordingAction = document.querySelector('.action-input.recording');
             let targetInput;
-            let value;
-
-            // テンプレートの値を設定
-            switch(type) {
-                case 'copy':
-                    value = 'ctrl+c';
-                    break;
-                case 'paste':
-                    value = 'ctrl+v';
-                    break;
-                case 'cut':
-                    value = 'ctrl+x';
-                    break;
-                case 'selectAll':
-                    value = 'ctrl+a';
-                    break;
-                case 'rightClick':
-                    value = 'right_click';
-                    break;
-                case 'leftClick':
-                    value = 'left_click';
-                    break;
-                case 'middleClick':
-                    value = 'middle_click';
-                    break;
-            }
 
             // アクション入力中かキー入力中かを判定
             if (recordingAction) {
@@ -1366,34 +1355,26 @@
                 targetInput = keyInput;
                 keyInput.classList.remove('recording');
             } else if (lastFocusedInput) {
-                // 最後にフォーカスされていた入力フィールドを使用
                 targetInput = lastFocusedInput;
             } else {
-                // フォーカスされている要素がない場合は、最後のアクション入力フィールドを使用
                 const actionInputs = document.querySelectorAll('.action-input');
                 if (actionInputs.length > 0) {
                     targetInput = actionInputs[actionInputs.length - 1];
                 } else {
-                    // アクション入力フィールドがない場合は新しく作成
                     const newActionItem = addActionInput();
                     targetInput = newActionItem.querySelector('.action-input');
                 }
             }
 
-            // 値を設定
             targetInput.value = value;
 
-            // キー入力フィールドの場合は重複チェック
             if (targetInput === keyInput) {
                 checkKeyDuplicate();
             }
 
-            // 入力状態をリセット
             isRecordingKey = false;
             currentModifiers.clear();
             updateKeyPreview();
-
-            // フォーカスを維持
             targetInput.focus();
         }
 
@@ -1459,6 +1440,7 @@
 
         // 初期読み込み
         loadConfig();
+        loadTemplates();
     </script>
 </body>
 </html> 

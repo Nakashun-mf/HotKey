@@ -1,0 +1,34 @@
+{
+    "templates": [
+      {
+        "type": "copy",
+        "label": "Ctrl + C",
+        "value": "ctrl+c"
+      },
+      {
+        "type": "paste",
+        "label": "Ctrl + V",
+        "value": "ctrl+v"
+      },
+      {
+        "type": "rightClick",
+        "label": "right_click",
+        "value": "right_click"
+      },
+      {
+        "type": "leftClick",
+        "label": "left_click",
+        "value": "left_click"
+      },
+      {
+        "type": "middleClick",
+        "label": "middle_click",
+        "value": "middle_click"
+      },
+      {
+        "type": "enter",
+        "label": "enter",
+        "value": "enter"
+      }
+    ]
+  }
