@@ -1,5 +1,5 @@
 import keyboard
-import pyautogui
+import pydirectinput as pdi
 import json
 import sys
 import time
@@ -9,27 +9,27 @@ import logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
 
-# PyAutoGUIの安全機能設定
-pyautogui.FAILSAFE = True  # マウスを画面左上角に移動すると停止
-pyautogui.PAUSE = 0.1  # 各操作間の待機時間
+# PyDirectInputの設定
+pdi.PAUSE = 0.1  # 各操作間の待機時間
+pdi.FAILSAFE = True  # 安全機能を有効
 
 def perform_actions(actions):
-    """指定されたアクションのリストを順番に実行する関数"""
+    """指定されたアクションのリストを順番に実行する関数（PyDirectInput版）"""
     try:
         for action in actions:
             logger.info(f"実行中のアクション: {action}")
             
             if action == "right_click":
-                pyautogui.click(button='right')
+                pdi.rightClick()
             elif "+" in action:
                 # 複合キーの処理（例：ctrl+v）
                 keys = action.split("+")
                 # キーの正規化
                 normalized_keys = [key.strip().lower() for key in keys]
-                pyautogui.hotkey(*normalized_keys)
+                pdi.hotkey(*normalized_keys)
             else:
                 # 単一キーの処理
-                pyautogui.press(action.strip().lower())
+                pdi.press(action.strip().lower())
             
             # アクション間の短い待機
             time.sleep(0.05)
@@ -104,7 +104,7 @@ def register_hotkeys():
     return registered_count > 0
 
 def check_system_compatibility():
-    """システム互換性をチェックする関数"""
+    """システム互換性をチェックする関数（PyDirectInput版）"""
     try:
         # キーボードライブラリのテスト
         keyboard.is_pressed('shift')
@@ -114,18 +114,19 @@ def check_system_compatibility():
         return False
     
     try:
-        # PyAutoGUIのテスト
-        pyautogui.size()
-        logger.info("PyAutoGUIライブラリ: OK")
+        # PyDirectInputのテスト
+        pdi.size()
+        logger.info("PyDirectInputライブラリ: OK")
     except Exception as e:
-        logger.error(f"PyAutoGUIライブラリエラー: {e}")
+        logger.error(f"PyDirectInputライブラリエラー: {e}")
         return False
     
     return True
 
 if __name__ == "__main__":
     try:
-        logger.info("HotKeyプログラムを開始します...")
+        logger.info("HotKeyプログラム（PyDirectInput版）を開始します...")
+        logger.info("このバージョンはより高い互換性とゲーム対応を提供します")
         
         # システム互換性チェック
         if not check_system_compatibility():
